@@ -1,4 +1,3 @@
-# Bot-test
 # Bot Test
 
 Primer paso para crear versión inicial de
