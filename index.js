@@ -1,6 +1,7 @@
 // Ejecutar node (o nodejs) archivo.js, luego 
 // POr esta vez. Modificar por seguridad.
 const app_token = 'EAACF1jHbmN4BAAA5kuxMFh2fSwYKSZBitRT0CEARU5ICYRxVn3ZC44GCt9pU0XsceOAcyR35jTF2n49cQOgBuk0KaZCqoF7g5JnMcLK5lYvVc8k47NuIwIxqH8Fd8B39ataPo73J4HaghDbNMBuCYs0j2MdTEuZB4ovaZC1PRPQZDZD';
+//const app_id = '147155005970654';
 
 // Importación
 var express = require('express');
@@ -22,11 +23,57 @@ app.get('/', function(req, res){
 	res.send('Primer paso del bot');
 });
 
+/* Ejemplo de recepción de mensaje por chat
+{ object: 'page',
+  entry: 
+  [ { id: '1155894324513208',
+       time: 1518494730266,
+       messaging: [Object] } ] }
+*/
+
+
+
 //Evíamos token y recibimos un autentificador (challenge)
+// Validación de servidores
 app.get('/webhook', function(req, res){
-	if(req.query['hub.verify_token'] == 'test_token_botin2x	'){
+	if(req.query['hub.verify_token'] == 'test_token_botin2x'){
 		res.send(req.query['hub.challenge']);
 	}else{
 		res.send('Ups, autentificación errónea.');
 	}
 });
+
+// Valdidación y recorrido de eventos
+app.post('/webhook', function(req, res){
+	var data = req.body;
+	if(data.object == 'page'){
+		data.entry.forEach(function(pageEntry){ //Recorrido de entradas
+			pageEntry.messaging.forEach(function(messagingEvent){ //Recorrido de eventos
+				if(messagingEvent.message){
+					receiveMessage(messagingEvent);// Mensaje?
+				}else{
+					console.log('Lo recibido no es un mensaje válido');
+				};
+			});
+		});
+	res.sendStatus(200); //Enviamos OK a Facebook
+	}
+});
+
+/* Ejemplo de mensaje
+{ sender: { id: '1590567334358752' },
+  recipient: { id: '1155894324513208' },
+  timestamp: 1518496420927,
+  message: 
+   { mid: 'mid.$cAAQbR88ntOxnvrXcP1hjXCTjp1Qr',
+     seq: 692507,
+     text: 'Hola' } }
+*/
+
+// Obtenemos el mensaje
+function receiveMessage(event){
+	var senderID = event.sender.id; // ID remitente
+	var messageText = event.message.text; // Mensaje remitente
+	console.log(senderID);
+	console.log(messageText);
+}
