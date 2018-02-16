@@ -76,4 +76,53 @@ function receiveMessage(event){
 	var messageText = event.message.text; // Mensaje remitente
 	console.log(senderID);
 	console.log(messageText);
+	evaluateMessage(senderID, messageText);
+}
+
+
+//Evaluamos el mensaje
+function evaluateMessage(recipientID, message){
+	var finalMessage = '';
+	console.log('evaluacion 1');
+	if(isContain(message, 'ayuda')){
+		finalMessage = 'No me siento capaz de ayudarte, lo siento';
+		//console.log('no tiene ayuda');
+	}else{
+		finalMessage = 'Solo me han programado para repetir :( ' + message;
+		//console.log("Ya envié la copia del mensaje");
+	}
+	sendMessageText(recipientID, finalMessage);
+}
+
+//Mensaje final a enviar
+function sendMessageText(recipientID, message){
+	var messageData = {
+		recipient: { 
+			id: recipientID
+		},
+		message: {
+			text: message
+		}
+	};
+	callSendAPI(messageData);
+}
+
+function callSendAPI(messageData){
+	request({
+		uri: 'https://graph.facebook.com/v2.12/me/messages',
+		qs: { acces_token : app_token},
+		method: 'POST',
+		json: messageData
+	}, function(error, response, data){
+			if(error){
+				console.log('No es posible enviar el mensaje');
+			}else{
+				console.log('El mensaje fue enviado con exito');
+			}
+	});
+}
+
+//Análisis del mensaje
+function isContain(sentence, word){
+	return sentence.indexOf(word) > -1;
 }
